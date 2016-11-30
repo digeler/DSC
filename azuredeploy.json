@@ -1,0 +1,62 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "type": "string",
+      "defaultValue": "dintestvm",
+      "metadata": {
+        "description": "Name of the existing VM to apply the DSC configuration to"
+      }
+    },
+    "modulesUrl": {
+      "type": "string",
+      "defaultValue": "https://dintestvmsto01.blob.core.windows.net/dsc/initdisk.ps1.zip",
+      "metadata": {
+        "description": "URL for the DSC configuration package. NOTE: Can be a Github url(raw) to the zip file (this is the default value)"
+      }
+    },
+    "configurationFunction": {
+      "type": "string",
+      "defaultValue": "initdisk.ps1\\Diskconfig",
+      "metadata": {
+        "description": "DSC configuration function to call. Should contain filename and function in format fileName.ps1\\configurationfunction"
+      }
+    },
+    "nodeConfigurationName": {
+      "type": "string",
+      "defaultValue": "localhost",
+      "metadata": {
+        "description": "The name of the node configuration, on the Azure Automation DSC pull server, that this node will be configured as"
+      }
+    }
+  },
+  "variables": {
+
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName'),'/Microsoft.Powershell.DSC')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.19",
+        "autoUpgradeMinorVersion": true,
+        "protectedSettings": {
+          "Items": {
+           
+          }
+        },
+        "settings": {
+          "ModulesUrl": "[parameters('modulesUrl')]",
+          
+          "ConfigurationFunction": "[parameters('configurationFunction')]"
+         
+        }
+      }
+    }
+  ]
+}
